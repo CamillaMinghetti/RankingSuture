@@ -20,7 +20,7 @@ col_img, col_val = st.columns([3, 1])
 with col_img:
     img_path = immagini[st.session_state.img_index]
     img = Image.open(img_path)
-    st.image(img, use_column_width=True)
+    st.image(img, width=500)  # Immagine più piccola, regola il valore a piacere
 
 # Selezione punteggio
 with col_val:
@@ -48,3 +48,4 @@ st.divider()
 st.subheader("Valutazioni correnti:")
 for i, score in enumerate(st.session_state.punteggi, start=1):
     st.write(f"Immagine {i}: {score if score else 'Non valutata'}")
+
