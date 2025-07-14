@@ -41,15 +41,24 @@ elif not st.session_state.finished:
         st.subheader(f"Ranking for suture #{st.session_state.img_index + 1}:")
         
         current_score = st.session_state.punteggi[st.session_state.img_index]
-        
+
+        # Genera opzioni 1-12
+        options = list(range(1, 13))
+
+        # Se c'è un valore salvato, usa quello per l'indice iniziale, altrimenti default 0
+        default_index = options.index(current_score) if current_score in options else 0
+
+        # Radio con chiave fissa, così non resetta su cambio immagine
         selected = st.radio(
             label="Select the rank:",
-            options=list(range(1, 13)),
-            index=current_score - 1 if current_score else 0,
-            key=f"punteggio_{st.session_state.img_index}"
+            options=options,
+            index=default_index,
+            key="rank_selector"
         )
         
-        st.session_state.punteggi[st.session_state.img_index] = selected
+        # Aggiorna solo se cambia il valore selezionato
+        if selected != current_score:
+            st.session_state.punteggi[st.session_state.img_index] = selected
 
     col_prev, col_next = st.columns(2)
     with col_prev:
