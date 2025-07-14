@@ -3,7 +3,6 @@ from PIL import Image
 
 st.set_page_config(page_title="Ranking of sutures by complexity", layout="wide")
 
-# --- Pagina iniziale ---
 if 'started' not in st.session_state:
     st.session_state.started = False
 if 'finished' not in st.session_state:
@@ -39,24 +38,22 @@ elif not st.session_state.finished:
 
     with col_val:
         st.subheader(f"Ranking for suture #{st.session_state.img_index + 1}:")
-        
+
         current_score = st.session_state.punteggi[st.session_state.img_index]
-
-        # Genera opzioni 1-12
         options = list(range(1, 13))
-
-        # Se c'è un valore salvato, usa quello per l'indice iniziale, altrimenti default 0
         default_index = options.index(current_score) if current_score in options else 0
 
-        # Radio con chiave fissa, così non resetta su cambio immagine
+        # key unica per ogni immagine
+        key_radio = f"rank_selector_{st.session_state.img_index}"
+
         selected = st.radio(
             label="Select the rank:",
             options=options,
             index=default_index,
-            key="rank_selector"
+            key=key_radio
         )
-        
-        # Aggiorna solo se cambia il valore selezionato
+
+        # aggiorna solo se cambia
         if selected != current_score:
             st.session_state.punteggi[st.session_state.img_index] = selected
 
