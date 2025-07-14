@@ -47,8 +47,18 @@ if st.session_state.pagina == 0 and not st.session_state.finished:
     for i, score in enumerate(st.session_state.punteggi, start=1):
         st.write(f"Sutura {i}: {score if score else 'Non ancora classificata'}")
 
-    if st.button("Avanti"):
-        st.session_state.pagina = 1
+    # Controllo: tutti i numeri devono essere unici e da 1 a 12
+    punteggi_validi = [p for p in st.session_state.punteggi if p is not None]
+    numeri_doppi = len(set(punteggi_validi)) != len(punteggi_validi)
+    numeri_non_validi = sorted(punteggi_validi) != list(range(1, 13))
+
+    if len(punteggi_validi) < 12:
+        st.warning("Classifica tutte le suture prima di proseguire.")
+    elif numeri_doppi or numeri_non_validi:
+        st.error("Ogni numero da 1 a 12 deve essere usato una sola volta!")
+    else:
+        if st.button("Avanti"):
+            st.session_state.pagina = 1
 
 # Pagina 1: Spiegazione e introduzione
 elif st.session_state.pagina == 1 and not st.session_state.finished:
