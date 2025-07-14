@@ -24,43 +24,28 @@ elif not st.session_state.finished:
 
     immagini = [f"sutura_{i}.jpg" for i in range(1, 13)]
 
-    if 'img_index' not in st.session_state:
-        st.session_state.img_index = 0
     if 'punteggi' not in st.session_state:
         st.session_state.punteggi = [None] * len(immagini)
 
-    col_img, col_val = st.columns([3, 1])
+    options = [None] + list(range(1, 13))
 
-    with col_img:
-        img_path = immagini[st.session_state.img_index]
-        img = Image.open(img_path)
-        st.image(img, width=500)
-
-    with col_val:
-        st.subheader(f"Ranking for suture #{st.session_state.img_index + 1}:")
-
-        current_score = st.session_state.punteggi[st.session_state.img_index]
-        options = [None] + list(range(1, 13))
-
-        selected = st.selectbox(
-            label="Select the rank:",
-            options=options,
-            format_func=lambda x: "Seleziona..." if x is None else str(x),
-            index=options.index(current_score) if current_score in options else 0,
-            key="rank_selector"
-        )
-
-        # Aggiorna il punteggio solo se cambia
-        if selected != current_score and selected is not None:
-            st.session_state.punteggi[st.session_state.img_index] = selected
-
-    col_prev, col_next = st.columns(2)
-    with col_prev:
-        if st.button("◀️ Previous"):
-            st.session_state.img_index = (st.session_state.img_index - 1) % len(immagini)
-    with col_next:
-        if st.button("Next ▶️"):
-            st.session_state.img_index = (st.session_state.img_index + 1) % len(immagini)
+    for row in range(4):
+        cols = st.columns(3)
+        for col_idx in range(3):
+            idx = row * 3 + col_idx
+            if idx < len(immagini):
+                with cols[col_idx]:
+                    img = Image.open(immagini[idx])
+                    st.image(img, width=250)
+                    selected = st.selectbox(
+                        f"Rank for suture {idx+1}",
+                        options=options,
+                        format_func=lambda x: "Seleziona..." if x is None else str(x),
+                        index=options.index(st.session_state.punteggi[idx]) if st.session_state.punteggi[idx] in options else 0,
+                        key=f"rank_selector_{idx}"
+                    )
+                    if selected != st.session_state.punteggi[idx] and selected is not None:
+                        st.session_state.punteggi[idx] = selected
 
     st.divider()
     st.subheader("Current rankings:")
