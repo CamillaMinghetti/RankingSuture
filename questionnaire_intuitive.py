@@ -1,5 +1,7 @@
 import streamlit as st
 from PIL import Image
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 st.set_page_config(page_title="Questionario Suture", layout="wide")
 
@@ -91,7 +93,30 @@ elif st.session_state.pagina == 2 and not st.session_state.finished:
     if st.button("Invia e termina"):
         st.session_state.finished = True
 
+def salva_su_google_sheet(punteggi, valutazioni):
+    # Autenticazione
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name("credenziali.json", scope)
+    client = gspread.authorize(creds)
+
+    # Apri il foglio
+    sheet = client.open("Questionario Suture").sheet1
+
+    # Calcola il prossimo soggetto
+    records = sheet.get_all_records()
+    soggetto = len(records) + 1
+
+    # Prepara la riga
+    row = [soggetto] + [p if p is not None else "" for p in punteggi] + [v if v is not None else "" for v in valutazioni]
+    sheet.append_row(row)
+
 # Pagina finale
-elif st.session_state.finished:
+if st.session_state.finished:
     st.title("Grazie per aver completato il questionario!")
     st.write("Le sue risposte sono state registrate.")
+
+    # Salva su Google Sheet solo una volta
+    if 'saved' not in st.session_state:
+        salva_su_google_sheet(st.session_state.punteggi, st.session_state.valutazioni)
+        st.session_state.saved = True
+        st.success("Risposte salvate su Google Sheet!")
