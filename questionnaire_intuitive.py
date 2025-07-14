@@ -40,24 +40,18 @@ elif not st.session_state.finished:
         st.subheader(f"Ranking for suture #{st.session_state.img_index + 1}:")
 
         current_score = st.session_state.punteggi[st.session_state.img_index]
-        options = list(range(1, 13))
-        key_radio = f"rank_selector_{st.session_state.img_index}"
+        options = [None] + list(range(1, 13))
+        key_select = f"rank_selector_{st.session_state.img_index}"
 
-        if current_score is not None:
-            selected = st.radio(
-                label="Select the rank:",
-                options=options,
-                index=options.index(current_score),
-                key=key_radio
-            )
-        else:
-            selected = st.radio(
-                label="Select the rank:",
-                options=options,
-                key=key_radio
-            )
+        selected = st.selectbox(
+            label="Select the rank:",
+            options=options,
+            format_func=lambda x: "Seleziona..." if x is None else str(x),
+            index=options.index(current_score) if current_score in options else 0,
+            key=key_select
+        )
 
-        if selected != current_score:
+        if selected != current_score and selected is not None:
             st.session_state.punteggi[st.session_state.img_index] = selected
 
     col_prev, col_next = st.columns(2)
