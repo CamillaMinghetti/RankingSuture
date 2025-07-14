@@ -103,7 +103,7 @@ def salva_su_google_sheet(punteggi, valutazioni):
     client = gspread.authorize(creds)
 
     # Apri il foglio
-    sheet = client.open("Questionario Suture").sheet1
+    sheet = client.open("Questionario Intuitive").sheet1
 
     # Calcola il prossimo soggetto
     records = sheet.get_all_records()
