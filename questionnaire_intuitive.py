@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
 st.set_page_config(page_title="Questionario Suture", layout="wide")
 
@@ -94,9 +94,12 @@ elif st.session_state.pagina == 2 and not st.session_state.finished:
         st.session_state.finished = True
 
 def salva_su_google_sheet(punteggi, valutazioni):
-    # Autenticazione
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("credenziali.json", scope)
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+    creds_data = st.secrets["gcp_service_account"]
+    creds = Credentials.from_service_account_info(creds_data, scopes=scope)
     client = gspread.authorize(creds)
 
     # Apri il foglio
