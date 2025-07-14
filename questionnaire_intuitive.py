@@ -1,51 +1,72 @@
 import streamlit as st
 from PIL import Image
 
-st.set_page_config(page_title="Classificazione Suture", layout="wide")
-st.title("Classifica la complessità delle suture")
+st.set_page_config(page_title="Ranking of sutures by complexity", layout="wide")
 
-# Lista immagini (in root)
-immagini = [f"sutura_{i}.jpg" for i in range(1, 13)]
+# --- Pagina iniziale ---
+if 'started' not in st.session_state:
+    st.session_state.started = False
+if 'finished' not in st.session_state:
+    st.session_state.finished = False
 
-# Stato
-if 'img_index' not in st.session_state:
-    st.session_state.img_index = 0
-if 'punteggi' not in st.session_state:
-    st.session_state.punteggi = [None] * len(immagini)
+if not st.session_state.started:
+    st.title("Welcome to the Suture Complexity Ranking")
+    st.write("""
+    Please classify the sutures based on their level of complexity,  
+    assigning a rank from 1 to 12, where **1** is the simplest suture and **12** the most complex.
+    """)
+    if st.button("Start"):
+        st.session_state.started = True
+        st.session_state.img_index = 0
+        st.session_state.punteggi = [None] * 12
 
-# Layout principale
-col_img, col_val = st.columns([3, 1])
+elif not st.session_state.finished:
+    st.title("Classify the complexity of sutures")
 
-# Mostra immagine corrente
-with col_img:
-    img_path = immagini[st.session_state.img_index]
-    img = Image.open(img_path)
-    st.image(img, width=500)  # Immagine più piccola, regola il valore a piacere
+    immagini = [f"sutura_{i}.jpg" for i in range(1, 13)]
 
-# Selezione punteggio
-with col_val:
-    st.subheader("Punteggio:")
-    punteggio = st.radio(
-        label="",
-        options=list(range(1, 13)),
-        index=(st.session_state.punteggi[st.session_state.img_index] - 1)
-        if st.session_state.punteggi[st.session_state.img_index] else 0,
-        key=f"radio_{st.session_state.img_index}"
-    )
-    st.session_state.punteggi[st.session_state.img_index] = punteggio
+    if 'img_index' not in st.session_state:
+        st.session_state.img_index = 0
+    if 'punteggi' not in st.session_state:
+        st.session_state.punteggi = [None] * len(immagini)
 
-# Bottoni navigazione
-col_prev, col_next = st.columns(2)
-with col_prev:
-    if st.button("◀️ Previous"):
-        st.session_state.img_index = (st.session_state.img_index - 1) % len(immagini)
-with col_next:
-    if st.button("Next ▶️"):
-        st.session_state.img_index = (st.session_state.img_index + 1) % len(immagini)
+    col_img, col_val = st.columns([3, 1])
 
-# Mostra punteggi assegnati
-st.divider()
-st.subheader("Valutazioni correnti:")
-for i, score in enumerate(st.session_state.punteggi, start=1):
-    st.write(f"Immagine {i}: {score if score else 'Non valutata'}")
+    with col_img:
+        img_path = immagini[st.session_state.img_index]
+        img = Image.open(img_path)
+        st.image(img, width=500)
 
+    with col_val:
+        st.subheader(f"Ranking for suture #{st.session_state.img_index + 1}:")
+        
+        current_score = st.session_state.punteggi[st.session_state.img_index]
+        
+        selected = st.radio(
+            label="Select the rank:",
+            options=list(range(1, 13)),
+            index=current_score - 1 if current_score else 0,
+            key=f"punteggio_{st.session_state.img_index}"
+        )
+        
+        st.session_state.punteggi[st.session_state.img_index] = selected
+
+    col_prev, col_next = st.columns(2)
+    with col_prev:
+        if st.button("◀️ Previous"):
+            st.session_state.img_index = (st.session_state.img_index - 1) % len(immagini)
+    with col_next:
+        if st.button("Next ▶️"):
+            st.session_state.img_index = (st.session_state.img_index + 1) % len(immagini)
+
+    st.divider()
+    st.subheader("Current rankings:")
+    for i, score in enumerate(st.session_state.punteggi, start=1):
+        st.write(f"Suture {i}: {score if score else 'Not ranked yet'}")
+
+    if st.button("Finish"):
+        st.session_state.finished = True
+
+else:
+    st.title("Thank you for completing the ranking!")
+    st.write("Your responses have been recorded.")
