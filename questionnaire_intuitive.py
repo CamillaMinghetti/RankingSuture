@@ -41,19 +41,22 @@ elif not st.session_state.finished:
 
         current_score = st.session_state.punteggi[st.session_state.img_index]
         options = list(range(1, 13))
-        default_index = options.index(current_score) if current_score in options else 0
-
-        # key unica per ogni immagine
         key_radio = f"rank_selector_{st.session_state.img_index}"
 
-        selected = st.radio(
-            label="Select the rank:",
-            options=options,
-            index=default_index,
-            key=key_radio
-        )
+        if current_score is not None:
+            selected = st.radio(
+                label="Select the rank:",
+                options=options,
+                index=options.index(current_score),
+                key=key_radio
+            )
+        else:
+            selected = st.radio(
+                label="Select the rank:",
+                options=options,
+                key=key_radio
+            )
 
-        # aggiorna solo se cambia
         if selected != current_score:
             st.session_state.punteggi[st.session_state.img_index] = selected
 
