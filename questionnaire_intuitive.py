@@ -41,16 +41,16 @@ elif not st.session_state.finished:
 
         current_score = st.session_state.punteggi[st.session_state.img_index]
         options = [None] + list(range(1, 13))
-        key_select = f"rank_selector_{st.session_state.img_index}"
 
         selected = st.selectbox(
             label="Select the rank:",
             options=options,
             format_func=lambda x: "Seleziona..." if x is None else str(x),
             index=options.index(current_score) if current_score in options else 0,
-            key=key_select
+            key="rank_selector"
         )
 
+        # Aggiorna il punteggio solo se cambia
         if selected != current_score and selected is not None:
             st.session_state.punteggi[st.session_state.img_index] = selected
 
